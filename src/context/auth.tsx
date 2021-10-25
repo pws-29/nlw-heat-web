@@ -15,6 +15,7 @@ type AuthContextData = {
   user: User | null;
   signInUrl: string;
   signOut: () => void;
+  isLoading: boolean;
 }
 
 export const AuthContext = createContext({} as AuthContextData);
@@ -35,10 +36,13 @@ type AuthResponse = {
 
 export function AuthProvider(props: AuthProvider) {
   const [user, setUser] = useState<User | null>(null); ``
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const signInUrl = `https://github.com/login/oauth/authorize?scope=user&client_id=4b31598c34ca1ab68f85`;
 
   async function signIn(githubCode: string) {
+    setIsLoading(true)
     const response = await api.post<AuthResponse>('authenticate', { // irá retornar dados e token do usuário
       code: githubCode
     })
@@ -50,11 +54,14 @@ export function AuthProvider(props: AuthProvider) {
     api.defaults.headers.common.authorization = `Bearer ${token}`;
 
     setUser(user);
+    setIsLoading(false);
   }
 
-  function signOut() {
+  async function signOut() {
+    setIsLoading(true)
     setUser(null);
     localStorage.removeItem('@dowhile:token')
+    setIsLoading(false);
   }
 
   // Preciso enviar o token junto com a requisição (no cabeçalho);
@@ -90,7 +97,7 @@ export function AuthProvider(props: AuthProvider) {
   // Retorna um componente que vem de dentro do contexto.
   // Provider permite que todos os componentes que estejam dentro dele tenham acesso à info do contexto.
   return (
-    <AuthContext.Provider value={{ signInUrl, user, signOut }}>
+    <AuthContext.Provider value={{ signInUrl, user, signOut, isLoading }}>
       {props.children}
     </AuthContext.Provider>
   )

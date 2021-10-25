@@ -3,6 +3,8 @@ import io from 'socket.io-client'
 import styles from './styles.module.scss'
 import logoImg from '../../assets/logo.svg'
 
+import { MESSAGES_EXAMPLE } from '../../utils/messagesSimulation'
+
 import { useEffect, useState } from 'react'
 
 type Message = {
@@ -15,7 +17,7 @@ type Message = {
 }
 
 //fila de mensagens (quantidade alta)
-const messagesQueue: Message[] = [];
+const messagesQueue: Message[] = MESSAGES_EXAMPLE;
 
 const socket = io('http://localhost:4000')
 
